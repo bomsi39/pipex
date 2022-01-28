@@ -6,7 +6,7 @@
 #    By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/25 18:24:09 by dfranke           #+#    #+#              #
-#    Updated: 2022/01/28 14:11:30 by dfranke          ###   ########.fr        #
+#    Updated: 2022/01/28 14:16:30 by dfranke          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -71,8 +71,7 @@ clean:
 	@echo $(GREEN) " -> $(NAME) cache cleaned"
 
 fclean: clean
-	@rm -f $(NAME_PS)
-	@rm -f $(NAME_CH)
+	@rm -f $(NAME)
 	@$(MAKE) -sC $(LIBFT_DIR) fclean
 	@echo $(RED)"  -> $(NAME) deleted"
 
