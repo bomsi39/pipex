@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   terminate_free.c                                   :+:      :+:    :+:   */
+/*   free_terminate.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/28 13:46:23 by dfranke           #+#    #+#             */
-/*   Updated: 2022/01/28 13:46:34 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/01/29 14:12:37 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void	free_env(t_env *env)
 	while (env->pths[i])
 		free(env->pths[i++]);
 	free(env->pths);
+	free(env->shell);
 	while (env->fir_cmd)
 	{
 		tmp = env->fir_cmd->next;

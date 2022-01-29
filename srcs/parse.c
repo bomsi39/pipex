@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/28 13:27:27 by dfranke           #+#    #+#             */
-/*   Updated: 2022/01/28 14:00:24 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/01/29 14:16:26 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 
 void	parse_env(t_env *env, char **argv, char **envp)
 {
-	int i;
-	char *t_paths = NULL;
+	int		i;
+	char	*t_paths;
 
 	t_paths = NULL;
-	
 	if (!strcmp(argv[1], "here_doc"))
 	{
 		env->islimiter = true;
@@ -31,7 +30,7 @@ void	parse_env(t_env *env, char **argv, char **envp)
 		if (!ft_strncmp(envp[i], "PATH=", 5))
 			t_paths = ft_substr(envp[i], 5, (ft_strlen(envp[i]) - 1));
 		if (!ft_strncmp(envp[i], "SHELL=/bin/", 11))
-			env->shell=ft_substr(envp[i], 11, (ft_strlen(envp[i])));
+			env->shell = ft_substr(envp[i], 11, (ft_strlen(envp[i])));
 	}
 	env->pths = ft_split(t_paths, ':');
 	free(t_paths);
@@ -40,11 +39,11 @@ void	parse_env(t_env *env, char **argv, char **envp)
 void	parse_cmd(t_env *env, char **argv)
 {
 	int		i;
-	
+
 	i = 2 + env->islimiter;
 	while (i < env->ac - 1)
 	{
-		create_cmd(env, ft_split(argv[i], ' '), argv[i]);
+		create_cmd(env, ft_split(argv[i], ' '));
 		i++;
 	}
 }
@@ -54,8 +53,8 @@ t_env	*init_env(int argc, char **envp)
 	t_env	*env;
 
 	env = malloc(sizeof(t_env));
-	//if (!env)
-		//terminate
+	if (!env)
+		return (0);
 	env->fir_cmd = NULL;
 	env->lst_cmd = NULL;
 	env->fdin = 0;
@@ -64,8 +63,9 @@ t_env	*init_env(int argc, char **envp)
 	env->pths = NULL;
 	env->limiter = NULL;
 	env->islimiter = false;
-	env->ac	= argc;
+	env->ac = argc;
 	env->cmd_no = argc - 3;
+	env->pipe_no = env->cmd_no - 1;
 	return (env);
 }
 
