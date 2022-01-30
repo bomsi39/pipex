@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 15:08:20 by dfranke           #+#    #+#             */
-/*   Updated: 2022/01/29 14:17:58 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/01/30 14:20:16 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ int	main(int argc, char **argv, char **envp)
 	else
 	{
 		env = parse_args(argc, argv, envp);
-		pipex(env);
+		if (!env->error)
+			pipex(env);
 		free_env(env);
 		//system("leaks pipex");
 	}

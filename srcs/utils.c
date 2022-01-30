@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/28 13:32:51 by dfranke           #+#    #+#             */
-/*   Updated: 2022/01/29 14:12:29 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/01/30 18:31:18 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,18 +30,18 @@ void	set_io(t_env *env)
 	node = env->fir_cmd;
 	while (node)
 	{
-		if (node == env->fir_cmd)
+		if (node->idx == 1 && !env->lmt->islmt)
 		{
 			node->s_in = env->fdin;
 			node->s_out = env->pipes[0][1];
 		}
-		if (node != env->fir_cmd && node != env->lst_cmd)
+		else if (node->idx < env->cmd_no)
 		{
 			node->s_in = env->pipes[i][0];
 			node->s_out = env->pipes[i + 1][1];
 			i++;
 		}
-		if (node == env->lst_cmd)
+		else if (node->idx == env->cmd_no)
 		{
 			node->s_in = env->pipes[env->pipe_no - 1][0];
 			node->s_out = env->fdout;

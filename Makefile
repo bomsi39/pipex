@@ -6,7 +6,7 @@
 #    By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/25 18:24:09 by dfranke           #+#    #+#              #
-#    Updated: 2022/01/29 01:05:44 by dfranke          ###   ########.fr        #
+#    Updated: 2022/01/30 20:23:08 by dfranke          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,15 +14,16 @@ NAME:= pipex
 FILES:= \
 		main \
 		parse \
-		create_cmd_list \
+		create_env \
 		ft_pipex \
-		free_terminate \
-		utils
+		limiter \
+		utils \
+		free_terminate
 
 #-------libft--------
 LIBFT_DIR:=./libft/
 
-CC:=gcc -g
+CC:=gcc
 SOURCES_DIR:=srcs/
 HEADER_DIR:=includes/
 OBJECTS_DIR:=objs/
@@ -78,6 +79,8 @@ fclean: clean
 re:
 	@$(MAKE) fclean
 	@$(MAKE) all
+
+bonus: all
 
 .PHONY:		all clean fclean re
 

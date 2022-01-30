@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/28 13:37:20 by dfranke           #+#    #+#             */
-/*   Updated: 2022/01/29 14:10:59 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/01/30 20:00:57 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,26 +17,33 @@ void	close_ends(t_env *env, t_cmd *node)
 	int	j;
 
 	j = 0;
+	if (!env->lmt->islmt)
+		node->idx--;
 	while (j < env->pipe_no)
 	{
-		if (j != node->idx - 1 || node == env->fir_cmd)
+		if (node->idx == 0 || j != node->idx - 1)
 		{
-			if (close(env->pipes[j][0]) != 0)
+			if (close(env->pipes[j][0]))
 				perror("close [X][0]");
 		}
 		if (j != node->idx || node == env->lst_cmd)
 		{
-			if (close(env->pipes[j][1]) != 0)
+			if (close(env->pipes[j][1]))
 				perror("close [X][1]");
 		}
 		j++;
 	}
 }
 
+/*	LMT WRITE  NEEDS				[0][1]
+	1. CMD NEEDS		[0][0]	&&	[1][1]	||				[0][1]	--> close [0][0]	[1][0] [1][1]
+	2. CMD NEEDS		[1][0]	&&	[2][1]	||	[0][0]	&&	[1][1]	--> close [0][1]	[1][0]
+	Lst CMD NEEDS		[2][0]				||	[1][0]				--> close [0][0]	[0][1] [1][1]
+	*/
+
 void	exec_c(t_env *env, t_cmd *node)
 {
 	int		i;
-	char	*cmd;
 
 	if (dup2(node->s_in, STDIN_FILENO) < 0)
 		perror("1st dup");
@@ -44,21 +51,8 @@ void	exec_c(t_env *env, t_cmd *node)
 		perror("2nd dup");
 	close_ends(env, node);
 	i = 0;
-	while (env->pths[i])
-	{
-		cmd = ft_strinsjoin(env->pths[i], node->array[0], '/');
-		if (!access(cmd, X_OK))
-		{
-			execve(cmd, node->array, env->envp_c);
-			perror("Execve: ");
-		}
-		//write(2, node->array[0], 100);
-		free(cmd);
-		i++;
-	}
-	write(2, env->shell, ft_strlen(env->shell));
-	write(2, ": command not found: ", 21);
-	ft_putendl_fd(node->array[0], 2);
+	if (execve(node->pth, node->array, env->envp_c))
+		perror("execve: ");
 }
 
 void	fork_loop(t_env *env)
@@ -68,10 +62,10 @@ void	fork_loop(t_env *env)
 	node = env->fir_cmd;
 	while (node)
 	{
-		node->child = fork();
-		if (node->child < 0)
-			perror("Error: ");
-		else if (!node->child)
+		node->pid = fork();
+		if (node->pid < 0)
+			perror("cmd fork: ");
+		else if (!node->pid)
 			break ;
 		node = node->next;
 	}
@@ -91,7 +85,9 @@ void	pipex(t_env *env)
 			perror("pipe: ");
 	}
 	set_io(env);
-	fork_loop(env);
+	fork_lmt(env);
+	if (env->lmt->pid)
+		fork_loop(env);
 	i = 0;
 	while (i < env->pipe_no)
 	{
