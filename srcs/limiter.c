@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 19:59:48 by dfranke           #+#    #+#             */
-/*   Updated: 2022/02/01 15:58:32 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/02/01 18:54:00 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ void	fork_lmt(t_env *env)
 		perror("limiter fork: ");
 	else if (!env->lmt->pid)
 		get_input(env);
+		waitpid(-1, &status, 0);
+}
 }
 
 /*
