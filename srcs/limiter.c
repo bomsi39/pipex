@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 19:59:48 by dfranke           #+#    #+#             */
-/*   Updated: 2022/01/30 20:00:36 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/02/01 15:36:14 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,10 @@ void	close_ends_lmt(t_env *env)
 	}
 }
 
+/*
+closes all unused fd
+*/
+
 void	get_input(t_env *env)
 {
 	char	*line;
@@ -40,20 +44,31 @@ void	get_input(t_env *env)
 	{
 		line = get_next_line(0);
 		if (!ft_strncmp(line, env->lmt->lmtr, ft_strlen(env->lmt->lmtr)))
+		{
+			free(line);
 			return ;
+		}
 		if (write(env->pipes[0][1], line, ft_strlen(line)) < 0)
 			perror("write");
+		free(line);
 	}
 }
+/*
+get_input closes at first all unused fd's of the pipes fd array and gets the 
+user input via get_next_line and sends it line by line to the pipes arrays 
+first input fd. If the limiter is matched. User input is terminated.
+*/
 
 void	fork_lmt(t_env *env)
 {
-	if (env->lmt->islmt)
-	{
-		env->lmt->pid = fork();
-		if (env->lmt->pid < 0)
-			perror("limiter fork: ");
-		else if (!env->lmt->pid)
-			get_input(env);
-	}
+	env->lmt->pid = fork();
+	if (env->lmt->pid < 0)
+		perror("limiter fork: ");
+	else if (!env->lmt->pid)
+		get_input(env);
 }
+
+/*
+If the here_doc flag is set, fork_lmt creates a child process and sends the child
+to execute get_input.
+*/

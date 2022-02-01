@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/28 13:37:20 by dfranke           #+#    #+#             */
-/*   Updated: 2022/01/30 20:00:57 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/02/01 15:43:40 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,25 +35,40 @@ void	close_ends(t_env *env, t_cmd *node)
 	}
 }
 
-/*	LMT WRITE  NEEDS				[0][1]
-	1. CMD NEEDS		[0][0]	&&	[1][1]	||				[0][1]	--> close [0][0]	[1][0] [1][1]
-	2. CMD NEEDS		[1][0]	&&	[2][1]	||	[0][0]	&&	[1][1]	--> close [0][1]	[1][0]
-	Lst CMD NEEDS		[2][0]				||	[1][0]				--> close [0][0]	[0][1] [1][1]
-	*/
+/*
+All unused file descriptors are being closed for every cmd/child.
+If no limiter is set, IDX shifts -1 for every command in order
+to close the correct pipes.
+
+BASIC INUT:
+1. CMD NEEDS					[0][1]	--> close [0][0]	[1][0] [1][1]
+2. CMD NEEDS		[0][0]	&&	[1][1]	--> close [0][1]	[1][0]
+3. CMD NEEDS		[1][0]				--> close [0][0]	[0][1] [1][1]
+
+WITH LIMITER:
+LIM WRITE  NEEDS				[0][1]	-->	close [0][0]	[1][0] [1][1]
+1. CMD NEEDS		[0][0]	&&	[1][1]	--> close [0][1]	[1][0]
+2. CMD NEEDS		[1][0]				--> close [0][0]	[0][1] [1][1]
+*/
 
 void	exec_c(t_env *env, t_cmd *node)
 {
-	int		i;
-
 	if (dup2(node->s_in, STDIN_FILENO) < 0)
 		perror("1st dup");
 	if (dup2(node->s_out, STDOUT_FILENO) < 0)
 		perror("2nd dup");
 	close_ends(env, node);
-	i = 0;
 	if (execve(node->pth, node->array, env->envp_c))
 		perror("execve: ");
 }
+
+/*
+In ecec_c the STDIN / STDOUT fd's of the commands are being replaced by the
+fd's from the pipe array for evey child/cmd. Stored via set_io (utils.c) in 
+s_in & s_out.
+close_ends closes all unsused fd's from the pipe array.
+Finally execve is executed with the matching file path.
+*/
 
 void	fork_loop(t_env *env)
 {
@@ -73,6 +88,12 @@ void	fork_loop(t_env *env)
 		exec_c(env, node);
 }
 
+/*
+In the fork loop, fork is executed for every cmd once. The new child breaks
+out of this loop and ecec_c is executed for the child (parent is !node 
+after it reaches the last cmd.)
+*/
+
 void	pipex(t_env *env)
 {
 	int		status;
@@ -80,12 +101,13 @@ void	pipex(t_env *env)
 
 	i = 0;
 	while (i < env->pipe_no)
-	{	
+	{
 		if (pipe(env->pipes[i++]) < 0)
 			perror("pipe: ");
 	}
 	set_io(env);
-	fork_lmt(env);
+	if (env->lmt->islmt)
+		fork_lmt(env);
 	if (env->lmt->pid)
 		fork_loop(env);
 	i = 0;
@@ -98,3 +120,20 @@ void	pipex(t_env *env)
 	while (++i < env->cmd_no)
 		waitpid(-1, &status, 0);
 }
+
+/*
+In my approach, the parend process creates a child for every command and 
+for the bonus as well the I/O is being passed from one child to the other.
+The parent process does not execute any command, its waiting for the children
+to be finished.
+
+In pipex, at first the 2d array thats holding the pipes fd's is being filled
+In set_io, stin and stout variable is set for every command.
+If a here_doc is part of the program input, fork_lmt is executed.
+If it is executed, its child process has env->lmt->pid = 0. This way its child
+doesnt enter the fork loop. Just the parent does.
+If fork_lmt is not entered, env->lmt->pid was orignially set as -1 so the 
+parent will enter here as well.
+All open fds are being closed for the parent and children and finally the
+father waits for every child to finish.
+*/

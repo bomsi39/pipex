@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 15:03:06 by dfranke           #+#    #+#             */
-/*   Updated: 2022/01/30 20:20:57 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/02/01 14:23:14 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,16 @@
 # include <errno.h>
 # include <stdlib.h>
 # include <stdbool.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 # define ERR -1
+# define ERR_MALL 0
 # define ERR_PTH 1
 # define ERR_PER 2
 # define ERR_CMD 3
 
-/* STRUCT FOR LIMITER PROPERTIES */
+/* STRUCT FOR LIMITER */
 
 typedef struct s_lmt
 {
@@ -88,11 +91,14 @@ void	fork_lmt(t_env *env);
 
 /* UTILITY FUNCTIONS */
 
+void	access_cmds(t_env *env, t_cmd *node, char *tmp);
+void	access_io(t_env *env, char **argv);
 void	set_io(t_env *env);
 t_cmd	*cmdlast(t_cmd *lst);
 
 /* FREE & TERMINATE FUNCTIONS */
 
+void	wrong_input(int argc);
 void	free_env(t_env *env);
 void	free_array(char **array);
 int		terminate(t_env *env, int error, char *str);
