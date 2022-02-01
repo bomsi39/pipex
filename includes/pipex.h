@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 15:03:06 by dfranke           #+#    #+#             */
-/*   Updated: 2022/02/01 14:23:14 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/02/01 16:11:15 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ typedef struct s_env
 	int		cmd_no;				//NUMBER OF COMMANDS
 	int		pipe_no;			//NEEDE PIPES
 	int		error;				//ERROR MARKER
-	int		pipes[ ][2];		//PIPES I/O
+	int		pipes[][2];		//PIPES I/O
 }	t_env;
 
 /* MAIN FUNCTION */

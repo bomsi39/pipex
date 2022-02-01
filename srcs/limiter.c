@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 19:59:48 by dfranke           #+#    #+#             */
-/*   Updated: 2022/02/01 15:36:14 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/02/01 15:58:32 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ void	get_input(t_env *env)
 		free(line);
 	}
 }
+
 /*
 get_input closes at first all unused fd's of the pipes fd array and gets the 
 user input via get_next_line and sends it line by line to the pipes arrays 
