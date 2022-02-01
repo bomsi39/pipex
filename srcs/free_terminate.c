@@ -6,7 +6,7 @@
 /*   By: dfranke <dfranke@student.42wolfsburg.de>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/28 13:46:23 by dfranke           #+#    #+#             */
-/*   Updated: 2022/02/01 15:45:34 by dfranke          ###   ########.fr       */
+/*   Updated: 2022/02/01 16:27:33 by dfranke          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	free_env(t_env *env)
 int	terminate(t_env *env, int error, char *str)
 {
 	write(2, env->shell, ft_strlen(env->shell));
-	if (error == ERR_PTH)
+	if (error == ERR_MALL)
 	{
 		write(2, ": memory allocation failed", 26);
 		exit (0);
